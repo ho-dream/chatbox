@@ -1,0 +1,12 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "extends": [
+    "@tsconfig/recommended/tsconfig.json",
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
+  "exclude": ["node_modules", "tmp"]
+}

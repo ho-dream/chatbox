@@ -1,0 +1,47 @@
+{
+  "name": "hoppscotch",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "scripts": {
+    "dev": "pnpm --filter @hoppscotch/app dev",
+    "build": "pnpm --filter @hoppscotch/app build",
+    "preview": "pnpm --filter @hoppscotch/app preview",
+    "tauri": "tauri"
+  },
+  "engines": {
+    "node": ">=22.11.0",
+    "pnpm": ">=9.15.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-angular": "^19.6.0",
+    "@tauri-apps/cli": "^2.1.0",
+    "@tsconfig/node20": "^20.1.4",
+    "@tsconfig/recommended": "^1.0.8",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/node": "^20.17.10",
+    "concurrently": "^9.1.0",
+    "cross-env": "7.0.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "oxlint": "^0.14.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "zx": "^8.2.4"
+  },
+  "lint-staged": {
+    "packages/**/*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "oxlint -c .oxlintrc.json",
+      "biome check --write --unsafe --no-errors-on-unmatched"
+    ],
+    "!packages/**/*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+    ]
+  }
+}

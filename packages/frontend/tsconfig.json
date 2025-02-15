@@ -1,0 +1,17 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "extends": [
+    "@tsconfig/recommended/tsconfig.json",
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json",
+    "@tsconfig/create-react-app/tsconfig.json"
+  ],
+  "exclude": ["node_modules", "tmp"]
+}
