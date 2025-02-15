@@ -1,5 +1,5 @@
 {
-  "name": "hoppscotch",
+  "name": "chatbox",
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -8,10 +8,11 @@
   "type": "module",
   "description": "",
   "scripts": {
-    "dev": "pnpm --filter @hoppscotch/app dev",
-    "build": "pnpm --filter @hoppscotch/app build",
-    "preview": "pnpm --filter @hoppscotch/app preview",
-    "tauri": "tauri"
+    "dev": "pnpm --filter @chatbox/app dev",
+    "build": "pnpm --filter @chatbox/app build",
+    "preview": "pnpm --filter @chatbox/app preview",
+    "tauri": "tauri",
+    "tauri:dev": "pnpm tauri dev"
   },
   "engines": {
     "node": ">=22.11.0",
@@ -19,21 +20,21 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-angular": "^19.6.0",
-    "@tauri-apps/cli": "^2.1.0",
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-angular": "^19.7.1",
+    "@tauri-apps/cli": "^2.2.7",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/recommended": "^1.0.8",
     "@tsconfig/strictest": "^2.0.5",
-    "@types/node": "^20.17.10",
-    "concurrently": "^9.1.0",
+    "@types/node": "^20.17.19",
+    "concurrently": "^9.1.2",
     "cross-env": "7.0.3",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.11",
-    "oxlint": "^0.14.1",
+    "lint-staged": "^15.4.3",
+    "oxlint": "^0.15.10",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "zx": "^8.2.4"
+    "typescript": "^5.7.3",
+    "zx": "^8.3.2"
   },
   "lint-staged": {
     "packages/**/*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [

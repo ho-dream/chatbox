@@ -638,7 +638,7 @@ export default defineConfig(() => {
         filename: "index.html",
         template: "./index.html",
         scriptLoading: "defer",
-        title: "hoppscotch",
+        title: "chatbox",
       }),
       new rspack.DefinePlugin({
         "import.meta.env.MODE": JSON.stringify(process.env.NODE_ENV),

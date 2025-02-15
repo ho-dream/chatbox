@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "hoppscotch",
+  "productName": "chatbox",
   "version": "0.1.0",
-  "identifier": "com.hoppscotch.app",
+  "identifier": "com.chatbox.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:8080",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "hoppscotch",
+        "title": "chatbox",
         "width": 800,
         "height": 600
       }
