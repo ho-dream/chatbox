@@ -5,20 +5,22 @@ use std::sync::Arc;
 use tauri::Manager;
 use rusqlite::Connection;
 use axum::{
-    routing::get,
+    routing::{get, post},
     Router,
     response::Json,
-    serve,
+    extract::Query,
 };
 use serde_json::json;
 use tokio::runtime::Runtime;
 use tokio::sync::oneshot;
+use tower_http::cors::{CorsLayer};
 
 async fn start_axum_server(shutdown_rx: oneshot::Receiver<()>) {
     // 构建路由
     let app = Router::new()
         .route("/", get(|| async { Json(json!({"status": "running"})) }))
-        .route("/hello", get(|| async { Json(json!({"message": "Hello, World!"})) }));
+        .route("/hello", get(hello_handler))
+        .layer(CorsLayer::permissive()); // 允许所有来源
 
     // 设置监听地址
     let addr = SocketAddr::from(([127, 0, 0, 1], 3030));
@@ -63,6 +65,17 @@ fn init_database(app_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+#[derive(serde::Deserialize)]
+struct HelloParams {
+    name: String,
+}
+
+async fn hello_handler(Query(params): Query<HelloParams>) -> Json<serde_json::Value> {
+    Json(json!({
+        "message": format!("Hello, {}! You've been greeted from Rust!", params.name)
+    }))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

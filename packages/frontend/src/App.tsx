@@ -1,17 +1,18 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
 import ViteLogo from './assets/vite.svg';
 import TauriLogo from './assets/tauri.svg';
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import './App.css';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [greetMsg, setGreetMsg] = useState('');
+  const [name, setName] = useState('');
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+    const response = await fetch(`http://localhost:3030/hello?name=${name}`);
+    const data = await response.json();
+    setGreetMsg(data.message);
   }
 
   return (
