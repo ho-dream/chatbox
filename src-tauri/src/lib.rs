@@ -9,17 +9,26 @@ use axum::{
     Router,
     response::Json,
     extract::Query,
+    extract::State, // 引入 State
 };
 use serde_json::json;
 use tokio::runtime::Runtime;
 use tokio::sync::oneshot;
 use tower_http::cors::{CorsLayer};
+use std::sync::Mutex;
 
-async fn start_axum_server(shutdown_rx: oneshot::Receiver<()>) {
+// 定义一个结构体来保存数据库连接
+#[derive(Clone)]
+struct AppState {
+    db: Arc<Mutex<Connection>>,
+}
+
+async fn start_axum_server(db: Arc<Mutex<Connection>>, shutdown_rx: oneshot::Receiver<()>) {
     // 构建路由
     let app = Router::new()
         .route("/", get(|| async { Json(json!({"status": "running"})) }))
         .route("/hello", get(hello_handler))
+        .with_state(AppState { db }) // 添加状态
         .layer(CorsLayer::permissive()); // 允许所有来源
 
     // 设置监听地址
@@ -38,7 +47,7 @@ async fn start_axum_server(shutdown_rx: oneshot::Receiver<()>) {
         .unwrap();
 }
 
-fn init_database(app_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+fn init_database(app_dir: &PathBuf) -> Result<Connection, Box<dyn std::error::Error>> { // 修改返回类型
     // 确保数据目录存在
     fs::create_dir_all(app_dir)?;
 
@@ -58,7 +67,13 @@ fn init_database(app_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
         [],
     )?;
 
-    Ok(())
+    // 插入测试数据
+    conn.execute(
+        "INSERT INTO users (name) VALUES (?)",
+        &[&"Test User"],
+    )?;
+
+    Ok(conn) // 返回数据库连接
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -72,9 +87,23 @@ struct HelloParams {
     name: String,
 }
 
-async fn hello_handler(Query(params): Query<HelloParams>) -> Json<serde_json::Value> {
+// 修改 hello_handler 函数，使其可以访问数据库连接
+async fn hello_handler(
+    Query(params): Query<HelloParams>,
+    State(state): State<AppState>,
+) -> Json<serde_json::Value> {
+    let db = state.db.lock().unwrap();
+    // 这里可以使用 db 连接进行数据库操作
+    // 例如：
+    let mut stmt = db.prepare("SELECT name FROM users WHERE id = 1").unwrap();
+    let mut rows = stmt.query([]).unwrap();
+    let user_name = match rows.next().unwrap() {
+        Some(row) => row.get::<_, String>(0).unwrap(),
+        None => "No user".to_string(),
+    };
+
     Json(json!({
-        "message": format!("Hello, {}! You've been greeted from Rust!", params.name)
+        "message": format!("Hello, {}! You've been greeted from Rust! User from DB: {}", params.name, user_name)
     }))
 }
 
@@ -93,15 +122,20 @@ pub fn run() {
             let app_dir = app.path().app_data_dir().expect("Failed to get app data dir");
 
             // 初始化数据库
-            if let Err(e) = init_database(&app_dir) {
-                eprintln!("Failed to initialize database: {}", e);
-            }
+            let db: Arc<Mutex<Connection>> = match init_database(&app_dir) {
+                Ok(conn) => Arc::new(Mutex::new(conn)),
+                Err(e) => {
+                    eprintln!("Failed to initialize database: {}", e);
+                    panic!("Failed to initialize database"); // 如果数据库初始化失败，则 panic
+                }
+            };
 
             // 在新的线程中启动 axum 服务器
             let rt = runtime_clone.clone();
+            let db_clone = db.clone(); // 克隆数据库连接
             std::thread::spawn(move || {
                 rt.block_on(async {
-                    start_axum_server(shutdown_rx).await;
+                    start_axum_server(db_clone, shutdown_rx).await; // 传递数据库连接
                 });
             });
 
